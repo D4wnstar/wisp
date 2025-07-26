@@ -1,0 +1,5 @@
+An implementation of a [self-organizing map](https://en.wikipedia.org/wiki/Self-organizing_map) (or Kohonen network) applied on the classic Fisher's iris dataset to reduce the dimensionality from 4 to 2. Visualization of the results and the training process is provided through a handful of plots and animations.
+
+All the plotted results are under `plots`. Each script can be used individually by running `julia file_name.jl` if you have all necessary packages in the global environment or by opening the REPL using `julia` and running `include("file_name")` if you want to instantiate a new environment. The `train_model.jl` script might take a few minutes to complete. The `predictor.jl` script is an unfinished attempt at chaining a second network to interpret the results of the self-organizing map; it does not currently work, but is left here as a curiosity.
+
+Project done in mid 2023 as the exam project for my introductory course in Theory of Neural Networks.

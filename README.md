@@ -1,0 +1,3 @@
+A repository containing all of my standalone scientific computing projects. The name stands for `(The) World Is a Simulation, Probably`.
+
+This is a monorepo, meaning it's a collection of other repos. Each individual project folder should be considered to be its own indipendent repository, with its own environment and dependencies. If you want to run the code yourself by cloning this entire repo, please `cd` into a project folder before running any of its script, as relative paths expect you to be in that project's root directory.
