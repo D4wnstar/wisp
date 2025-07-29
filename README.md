@@ -14,10 +14,10 @@ I make an effort to make all of these projects understandable even without runni
 ## Building
 Handling distribution on a polyglot codebase is a pain and it's even worse in monorepo where each project has its own dependencies. As such, you will not find precompiled binaries for these projects. This is expected for interpreted languages, but can be annoying for compiled ones. I attempt to have the same code structure for all projects of the same language however. You can follow the guidelines below to run the projects.
 
-> [!tip] Tip
+> [!important]
 > Since each project is considered to be an indipendent repository, you should always work on them while in their root folder. Trying to run a project from somewhere else is a recipe for disaster, mostly due to relative paths. Please `cd` into a project folder before running any of its script. All the following information assumes that you did.
 
-> [!warning] Warning
+> [!warning]
 > I do the grand majority of my programming on Linux, so I can't guarantee that these projects will run perfectly on other operating systems. This is mostly relevant for anything with graphical rendering, which can work change a lot from OS to OS.
 
 ### Julia
@@ -28,7 +28,7 @@ Rust is a compiled language. Each Rust project provides a `Cargo.toml` and `Carg
 
 I rely a lot on the [Bevy](https://bevy.org/) game engine for these projects in order to have an interactive real-time process with a rendering backbone. Bevy is still early in development and doesn't have a graphical editor, but that's almost a positive in this case, since it feels like just another programming library instead of a separate piece of software like other engines.
 
-> [!warning] Bevy
+> [!warning]
 > A note of warning: Bevy is pretty demanding on compilation time (even for Rust standards...) so beware of long compile times. The [quick start guide](https://bevy.org/learn/quick-start/introduction/) has tips for faster compilation. Also, the compilation artefacts can be quite hefty for such a large library: I've seen the `target` folder get into the ~20 GiB range just by tinkering with the gas simulation project, not to mention a 1 GiB debug executables.
 
 ### Godot
