@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bhgjghnascbov"]
+
+[ext_resource type="Script" uid="uid://draw331r3yokl" path="res://game.gd" id="1_ksisf"]
+
+[node name="Universe" type="Node2D"]
+script = ExtResource("1_ksisf")
+step_every = 0.2

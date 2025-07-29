@@ -1,0 +1,25 @@
+This is a collection of interesting starting seeds, given as a boolean matrix and maybe code.
+
+### Horizontal line
+[
+	range(columns).map(func(i): return 1),
+]
+
+### Line to pulsar
+Needs 20 rows and offset (5, 5).
+[
+	range(15).map(func(i): return 1),
+]
+
+### Kok's Galaxy
+[
+	[1, 1, 1, 1, 1, 1, 0, 1, 1],
+	[1, 1, 1, 1, 1, 1, 0, 1, 1],
+	[0, 0, 0, 0, 0, 0, 0, 1, 1],
+	[1, 1, 0, 0, 0, 0, 0, 1, 1],
+	[1, 1, 0, 0, 0, 0, 0, 1, 1],
+	[1, 1, 0, 0, 0, 0, 0, 1, 1],
+	[1, 1, 0, 0, 0, 0, 0, 0, 0],
+	[1, 1, 0, 1, 1, 1, 1, 1, 1],
+	[1, 1, 0, 1, 1, 1, 1, 1, 1],
+]
