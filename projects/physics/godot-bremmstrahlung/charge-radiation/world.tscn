@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://y8bl48rxalnw"]
+
+[ext_resource type="PackedScene" uid="uid://5hhwx8765b1a" path="res://charge-radiation/charge.tscn" id="1_wab0n"]
+[ext_resource type="Script" uid="uid://dids4juf7wxq3" path="res://charge-radiation/world.gd" id="1_wfxpu"]
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_wfxpu")
+L = 15.0
+F0 = 20.0
+C = 25.0
+
+[node name="Charge" parent="." instance=ExtResource("1_wab0n")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.535222, 3.69235e-08, -0.844711, 0.844711, -2.33953e-08, 0.535222, 0, -1, -4.37114e-08, -14, 4.79009, -0.000207901)
+shadow_enabled = true
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.805391, -0.591223, -0.0424396, 0.579105, -0.800111, 0.156396, -0.126421, 0.101383, 0.986782, -0.125453, 0.0947099, 8.79731)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.999455, 0.0295013, -0.0147864, -0.028545, 0.997719, 0.0611709, 0.0165573, -0.0607155, 0.998018, -0.165752, 0.53789, 14.8873)
+current = true

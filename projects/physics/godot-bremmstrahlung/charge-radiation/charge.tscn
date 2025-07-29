@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3 uid="uid://5hhwx8765b1a"]
+
+[ext_resource type="Script" uid="uid://ryh001lfsesj" path="res://charge-radiation/charge.gd" id="1_qc5m8"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qc5m8"]
+albedo_color = Color(0.258673, 0.441032, 0.865965, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_qc5m8"]
+material = SubResource("StandardMaterial3D_qc5m8")
+
+[sub_resource type="SphereMesh" id="SphereMesh_44prb"]
+radius = 1.0
+height = 2.0
+
+[node name="Charge" type="Node3D"]
+script = ExtResource("1_qc5m8")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_qc5m8")
+
+[node name="RadiationMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_44prb")
