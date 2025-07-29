@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://y8bl48rxalnw"]
 
-[ext_resource type="PackedScene" uid="uid://5hhwx8765b1a" path="res://charge-radiation/charge.tscn" id="1_wab0n"]
-[ext_resource type="Script" uid="uid://dids4juf7wxq3" path="res://charge-radiation/world.gd" id="1_wfxpu"]
+[ext_resource type="PackedScene" uid="uid://5hhwx8765b1a" path="res://src/charge.tscn" id="1_wab0n"]
+[ext_resource type="Script" uid="uid://dids4juf7wxq3" path="res://src/world.gd" id="1_wfxpu"]
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_wfxpu")
