@@ -4,7 +4,7 @@ The radiated power is calculated using Liénard's relativistic generalization of
 ```math
 \frac{dP_\text{charge}}{d\Omega}\sim\frac{\lvert \hat{\mathbf{n}}\times(\mathbf{u}\times \mathbf{a}) \rvert ^{2}}{(\hat{\mathbf{n}}\cdot \mathbf{u})^{5}}
 ```
-where $\mathbf{u}=c\hat{\mathbf{n}}-\mathbf{v}$, $c$ is the speed of light, $\hat{\mathbf{n}}$ is the unit vector from the point charge to the observer, and $\mathbf{v}$ and $\mathbf{a}$ are the velocity and acceleration vectors. $d\Omega$ is the unit solid angle and the Liènard formula is found by integrating this overall a full solid angle.
+where $\mathbf{u}=c\hat{\mathbf{n}}-\mathbf{v}$, $c$ is the speed of light, $\hat{\mathbf{n}}$ is the unit vector from the point charge to the observer, and $\mathbf{v}$ and $\mathbf{a}$ are the velocity and acceleration vectors. $d\Omega$ is the unit solid angle. This formula is missing a scaling constant, but since we only care about the behavior as the direction changes, we can safely drop it.
 
 The particle is made to move back and forth in an oscillatory pattern. At the edges, when the particle changes direction of motion, we can see that the shape around the charge is a torus, which is what is predicted by the nonrelativistic Larmor formula. When velocity is nonzero, the shape distorts in the direction of motion, becoming two lobes stretched forward.
 
