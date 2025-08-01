@@ -12,13 +12,13 @@ WISP is a collection of things I did for fun. I am a person that plans far into 
 I make an effort to make all of these projects understandable even without running any code yourself. This generally means producing images and animations showing the end result of the project and adding them to the repo. Most projects carry a `gallery` or `plots` folder that you can peruse to see what's going on without needing to build any code yourself.
 
 ## Building
-Handling distribution on a polyglot codebase is a pain and it's even worse in monorepo where each project has its own dependencies. As such, you will not find precompiled binaries for these projects. This is expected for interpreted languages, but can be annoying for compiled ones. I attempt to have the same code structure for all projects of the same language however. You can follow the guidelines below to run the projects.
+Handling distribution on a polyglot codebase is a pain and it's even worse in monorepo where each project has its own dependencies. As such, you will not (for now) find precompiled binaries for these projects. I attempt to have the same code structure for all projects of the same language however. You can follow the guidelines below to run the projects yourself.
 
-> [!tip] Tip
+> [!important]
 > Since each project is considered to be an indipendent repository, you should always work on them while in their root folder. Trying to run a project from somewhere else is a recipe for disaster, mostly due to relative paths. Please `cd` into a project folder before running any of its script. All the following information assumes that you did.
 
-> [!warning] Warning
-> I do the grand majority of my programming on Linux, so I can't guarantee that these projects will run perfectly on other operating systems. This is mostly relevant for anything with graphical rendering, which can work change a lot from OS to OS.
+> [!warning]
+> I do the grand majority of my programming on Linux, so I can't guarantee that these projects will run correctly on other operating systems. This refers mostly to graphical rendering, which can change a lot from OS to OS (and from X11 to Wayland on Linux, since I'm on Wayland).
 
 ### Julia
 Julia is a JIT-compiled language, meaning it requires no compilation. Each Julia project provides a `Project.toml` and `Manifest.toml` that contain the dependencies. It's recommended you always create a new virtual environment for each project. Open the REPL with `julia`, enter PKG mode by pressing `]`, then run `activate .`. This will create a new environment in the project folder. Run `instantiate` to download all packages. Then, while in the REPL, you can run individual scripts by importing their code with `include("script_name.jl")`. Alternatively, outside of the REPL, you can run `julia --project script_name.jl`, though using the REPL is much faster since it caches compilation.
@@ -28,7 +28,7 @@ Rust is a compiled language. Each Rust project provides a `Cargo.toml` and `Carg
 
 I rely a lot on the [Bevy](https://bevy.org/) game engine for these projects in order to have an interactive real-time process with a rendering backbone. Bevy is still early in development and doesn't have a graphical editor, but that's almost a positive in this case, since it feels like just another programming library instead of a separate piece of software like other engines.
 
-> [!warning] Bevy
+> [!warning]
 > A note of warning: Bevy is pretty demanding on compilation time (even for Rust standards...) so beware of long compile times. The [quick start guide](https://bevy.org/learn/quick-start/introduction/) has tips for faster compilation. Also, the compilation artefacts can be quite hefty for such a large library: I've seen the `target` folder get into the ~20 GiB range just by tinkering with the gas simulation project, not to mention a 1 GiB debug executables.
 
 ### Godot
