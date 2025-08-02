@@ -1,0 +1,2 @@
+# Jupyter Notebooks are extremely verbose, so remove them from the GitHub language breakdown
+.ipynb linguist-documentation
