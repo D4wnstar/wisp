@@ -18,7 +18,7 @@ fn main() {
 }
 
 /// The number of bodies in the simulation.
-const N: usize = 500;
+const N: usize = 1000;
 
 const TOTAL_MASS: f32 = 10e14; // Solar masses
 
@@ -56,6 +56,9 @@ struct HubbleParameter(f32);
 struct Body {
     mass: f32,
     velocity: Vec3,
+    /// Last step's f(x_{n+1}). Should be reused as next step's f(x_n).
+    /// None during the first step.
+    accel: Option<Vec3>,
 }
 
 impl Default for Body {
@@ -63,6 +66,7 @@ impl Default for Body {
         Self {
             mass: TOTAL_MASS / N as f32,
             velocity: Vec3::ZERO,
+            accel: None,
         }
     }
 }
@@ -150,20 +154,30 @@ fn integrate(
                 potential_grad += G * part_j.mass * r / (r.norm_squared() + GRAV_SOFT_SQ).powf(1.5);
             }
 
+            // vvv  Gravitation      vvv  Hubble drag
             -potential_grad / a_cb - 2.0 * H.0 * part_i.velocity
         };
 
         // Use leapfrog integration
-        let vel_midpoint = part_i.velocity + f(x_i) * dt / 2.0;
-        let new_pos = x_i + vel_midpoint * dt;
-        let new_vel = vel_midpoint + f(new_pos) * dt / 2.0;
-        new_coords.push((new_pos, new_vel));
+        // If there is a stored acceleration f(x) from last step, reuse it, else calculate it
+        let new_vel_mid = match part_i.accel {
+            Some(accel) => part_i.velocity + accel * dt / 2.0,
+            None => part_i.velocity + f(x_i) * dt / 2.0,
+        };
+        let new_pos = x_i + new_vel_mid * dt;
+        let accel = f(new_pos);
+        let new_vel = new_vel_mid + accel * dt / 2.0;
+
+        new_coords.push((new_pos, new_vel, accel));
     }
 
     // Apply new values
-    for ((mut part, mut transform), (new_pos, new_vel)) in particles.iter_mut().zip(new_coords) {
+    for ((mut part, mut transform), (new_pos, new_vel, new_accel)) in
+        particles.iter_mut().zip(new_coords)
+    {
         transform.translation = new_pos;
         part.velocity = new_vel;
+        part.accel = Some(new_accel);
     }
 }
 
