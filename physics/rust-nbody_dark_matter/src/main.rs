@@ -1,5 +1,7 @@
 #![allow(non_snake_case)] // For mathematical variables
 
+use std::sync::Mutex;
+
 use bevy::{dev_tools::fps_overlay::FpsOverlayPlugin, math::NormedVectorSpace, prelude::*};
 use rand::Rng;
 
@@ -18,14 +20,14 @@ fn main() {
 }
 
 /// The number of bodies in the simulation.
-const N: usize = 1000;
+const N: usize = 2000;
 
 const TOTAL_MASS: f32 = 10e14; // Solar masses
 
 const SIMULATION_SPEED: f32 = 60.0; // Myr/s (1 Myr/step at 60 FPS)
 
 /// The gravitational softening length.
-const GRAV_SOFT: f32 = 1.0; // Mpc
+const GRAV_SOFT: f32 = 2.0; // Mpc
 /// The square of the gravitational softening length.
 const GRAV_SOFT_SQ: f32 = GRAV_SOFT * GRAV_SOFT;
 
@@ -139,9 +141,10 @@ fn integrate(
     H.0 = HUBBLE_CONSTANT * (OMEGA_MATTER / a_cb + OMEGA_K / a_sq + OMEGA_LAMBDA).sqrt();
 
     // Integrate motion
-    let mut new_coords = Vec::new();
+    // Results are kept behind a mutex to allow parallel iteration
+    let new_coords = Mutex::new(Vec::new());
 
-    for (part_i, tr_i) in &particles {
+    particles.par_iter().for_each(|(part_i, tr_i)| {
         let x_i = tr_i.translation;
 
         // Equation of motion for the ODE ẍ = f(x)
@@ -168,12 +171,13 @@ fn integrate(
         let accel = f(new_pos);
         let new_vel = new_vel_mid + accel * dt / 2.0;
 
-        new_coords.push((new_pos, new_vel, accel));
-    }
+        let mut lock = new_coords.lock().unwrap();
+        lock.push((new_pos, new_vel, accel));
+    });
 
     // Apply new values
     for ((mut part, mut transform), (new_pos, new_vel, new_accel)) in
-        particles.iter_mut().zip(new_coords)
+        particles.iter_mut().zip(new_coords.into_inner().unwrap())
     {
         transform.translation = new_pos;
         part.velocity = new_vel;
