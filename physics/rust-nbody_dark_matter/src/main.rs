@@ -135,7 +135,7 @@ fn integrate(
     let dt = time.delta_secs() * SIMULATION_SPEED;
 
     // Update cosmological parameters
-    a.0 += H.0 * a.0 * dt; // Explicit Euler for ȧ = H(z)a
+    a.0 += H.0 * a.0 * dt; // Explicit Euler for ȧ = H(t)a
     let a_sq = a.0.powi(2);
     let a_cb = a.0.powi(3);
     H.0 = HUBBLE_CONSTANT * (OMEGA_MATTER / a_cb + OMEGA_K / a_sq + OMEGA_LAMBDA).sqrt();
@@ -195,9 +195,10 @@ fn update_ui(
     let t = START_TIME + time.elapsed_secs() * SIMULATION_SPEED;
     let a = scale.0;
     let H = hubble.0;
+    let z = 1.0 / a - 1.0;
 
     let mut text = query.iter_mut().next().unwrap();
     text.0 = format!(
-        "Cosmic time: t = {t:.0} Myr\nScale factor: a = {a:.3}\nHubble parameter: H = {H:.5} Myr^-1"
+        "Cosmic time: t = {t:.0} Myr\nRedshift: z = {z:.2}\nScale factor: a = {a:.3}\nHubble parameter: H = {H:.5} Myr^-1"
     );
 }
