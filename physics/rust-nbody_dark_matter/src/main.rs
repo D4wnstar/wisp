@@ -1,4 +1,4 @@
-#![allow(non_snake_case)] // For mathematical variables
+#![allow(non_snake_case)] // Allow proper mathematical variables
 
 use std::sync::Mutex;
 
@@ -19,29 +19,26 @@ fn main() {
         .run();
 }
 
-/// The number of bodies in the simulation.
+// Simulation parameters
+/// Number of bodies to simulate.
 const N: usize = 2000;
-
-const TOTAL_MASS: f32 = 10e14; // Solar masses
-
+const TOTAL_MASS: f32 = 10e15; // Solar masses
 const SIMULATION_SPEED: f32 = 60.0; // Myr/s (1 Myr/step at 60 FPS)
-
 /// The gravitational softening length.
 const GRAV_SOFT: f32 = 2.0; // Mpc
-/// The square of the gravitational softening length.
 const GRAV_SOFT_SQ: f32 = GRAV_SOFT * GRAV_SOFT;
-
-/// Newton's gravitational constant.
-const G: f32 = 4.50e-21; // Mpc^3 / (solar mass * Myr^2)
 
 // Cosmological parameters
 const OMEGA_MATTER: f32 = 0.315;
 const OMEGA_LAMBDA: f32 = 0.682;
 const OMEGA_K: f32 = 1.0 - OMEGA_MATTER - OMEGA_LAMBDA;
 const HUBBLE_CONSTANT: f32 = 6.893e-5; // Myr^-1
+/// Newton's gravitational constant.
+const G: f32 = 4.50e-21; // Mpc^3 / (solar mass * Myr^2)
 
-const START_REDSHIFT: f32 = 100.0; // ~16.6 Myr cosmic time in flat spacetime
-const START_TIME: f32 = 16.6; // Myr at redshift 100
+// Starting parameters
+const START_REDSHIFT: f32 = 3.0; // ~2.171 Gyr cosmic time in flat spacetime
+const START_TIME: f32 = 2171.0; // Myr at redshift 3
 const START_SCALE: f32 = 1.0 / (1.0 + START_REDSHIFT);
 const START_HUBBLE_PARAM_SQ: f32 = OMEGA_MATTER / (START_SCALE * START_SCALE * START_SCALE)
     + OMEGA_K / (START_SCALE * START_SCALE)
@@ -53,6 +50,7 @@ struct ScaleFactor(f32);
 #[derive(Resource)]
 struct HubbleParameter(f32);
 
+/// One particle/body to simulate.
 #[derive(Component)]
 #[require(Transform, Visibility, Mesh3d, MeshMaterial3d<StandardMaterial>)]
 struct Body {
@@ -76,6 +74,7 @@ impl Default for Body {
 #[derive(Component)]
 struct UiText;
 
+/// Spawn particles and set up UI.
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -89,7 +88,7 @@ fn setup(
     // Spawn particles
     let mut rng = rand::rng();
     for _ in 0..N {
-        // Spawn particles randomly in a 15 Mpc sphere centered in the origin
+        // Spawn particles uniformly in a 15 Mpc sphere centered in the origin
         // TODO: Add proper cosmological starting conditions.
         let pos = Vec3::new(
             rng.random_range(-1.0..1.0),
@@ -113,9 +112,9 @@ fn setup(
 
     // Set up UI
     commands.spawn((
-        Text::new(
-            "Cosmic time: t = 16.6 Myr\nScale factor: a = 0.099\nHubble parameter: H = 1 Myr^-1",
-        ),
+        Text::new(format!(
+            "Cosmic time: t = {START_TIME:.0} Myr\nRedshift: z = {START_REDSHIFT:.2}\nScale factor: a = {START_SCALE:.3}"
+        )),
         Node {
             position_type: PositionType::Absolute,
             bottom: px(5),
@@ -126,6 +125,7 @@ fn setup(
     ));
 }
 
+/// Integrate one physics step of motion using direct summation.
 fn integrate(
     time: Res<Time>,
     mut a: ResMut<ScaleFactor>,
@@ -147,17 +147,20 @@ fn integrate(
     particles.par_iter().for_each(|(part_i, tr_i)| {
         let x_i = tr_i.translation;
 
-        // Equation of motion for the ODE ẍ = f(x)
+        // Acceleration function for the ODE ẍ = f(x)
         let f = |x_i: Vec3| {
+            // Calculate collective potential gradient
+            // LaTeX: \nabla \Phi(\mathbf{x}_{i})=G\sum_{j=1}^{N}m_{j} \frac{\mathbf{x}_{i}-\mathbf{x}_{j}}{[(\mathbf{x}_{i}-\mathbf{x}_{j})^{2}+\epsilon ^{2}]^{3/2}}
             let mut potential_grad = Vec3::ZERO;
-
             for (part_j, tr_j) in &particles {
                 let x_j = tr_j.translation;
                 let r = x_i - x_j;
                 potential_grad += G * part_j.mass * r / (r.norm_squared() + GRAV_SOFT_SQ).powf(1.5);
             }
 
-            // vvv  Gravitation      vvv  Hubble drag
+            // Calculate acceleration in comoving coordinates
+            // LaTeX: \ddot{\mathbf{x}}_{i}=- \frac{1}{a^{3}}\nabla\Phi(\mathbf{x}_{i})- 2 H(z)\dot{\mathbf{x}}_{i}
+            // Gravity               Hubble drag
             -potential_grad / a_cb - 2.0 * H.0 * part_i.velocity
         };
 
@@ -185,6 +188,7 @@ fn integrate(
     }
 }
 
+/// Update the text on screen.
 fn update_ui(
     time: Res<Time>,
     scale: Res<ScaleFactor>,
