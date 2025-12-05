@@ -1,38 +1,53 @@
 using CairoMakie, CoherentNoise
 
+## Metallicity profiles
+generalized_cauchy(x::Real; amp=0.75, scale=4, power=1.2) = amp / (1 + scale * x)^power
+solar_fe_abundance = 0.00125 # Anders & Grevesse 1989, as mass fraction Z_{Fe, sun}
+cluster_fe_abundance = solar_fe_abundance / 3 # Rough estimate from known ICM behavior
+cluster_h_abundance = 0.71 # loose estimate starting from solar abundances
+cluster_fe_to_h = cluster_fe_abundance / cluster_h_abundance # Fe abundance w.r.t. H abundance
+
 ## Choose noise algorithm
-sampler = opensimplex_2d(seed=42) |>
-          s -> fbm_fractal_2d(seed=42, source=s, octaves=6, frequency=1.8, lacunarity=1.8, persistence=0.7) |>
-               s -> muladd(s, 0.5, 0.5) |>
-                    s -> muladd(s, 0.01, 0.99)
+sampler = opensimplex2_2d(seed=42) |>
+          s -> fbm_fractal_2d(seed=42, source=s, octaves=5, frequency=2.5, lacunarity=1.7, persistence=0.8) |>
+               s -> muladd(s, 0.5, 0.5) |> # Scale from [-1, 1] to [0, 1]
+                    s -> muladd(s, 0.5, 0.75) # Scale to [0.75, 1.25] to have random ±25% scalings
+
 
 # Initialize noise
 box_size = 2#Mpc
 half_diagonal = sqrt(2) / 2 * box_size
+radius_scale = 1.5#Mpc
 power = 0.02
 width = height = 1024
 noise = Matrix(undef, width, height)
 metallicity = Matrix(undef, width, height)
 for i in 1:width
     for j in 1:height
-        val = sample(sampler, i / width, j / height)
-        noise[i, j] = val
+        noise_sample = sample(sampler, i / width, j / height)
+        noise[i, j] = noise_sample
         # To find the distance, get the distance in index units, normalize it,
         # then multiply it by the physical unit
         norm_distance = sqrt((width / 2 - i)^2 + (height / 2 - j)^2) / sqrt(width^2 + height^2)
-        norm_distance = max(norm_distance, 0.005)
-        distance = norm_distance * half_diagonal
-        # Approximate metallicity profile as a negative power law scaled by random noise
-        metallicity[i, j] = val * (1 + distance)^(-power)
+        r = norm_distance * half_diagonal / radius_scale
+        metallicity[i, j] = noise_sample * generalized_cauchy(r) * cluster_fe_to_h
     end
 end
 
 # Plot noise
-f = Figure(size=(600, 900))
-ax_metal = Axis(f[1, 1], title="Oxygen abundance map")
+f = Figure(size=(900, 900))
+ax_metal = Axis(f[1, 1], title="Iron abundance map")
 ax_noise = Axis(f[2, 1], title="Noise map")
-hm_metal = heatmap!(ax_metal, metallicity, colormap=:rainbow)
+ax_profile = Axis(
+    f[1, 3],
+    title="Radial metallicity profile (iron)",
+    xscale=log10,
+    xticks=[0.01, 0.1, 1.0],
+    limits=(nothing, nothing, 0.0, 1.0)
+)
+hm_metal = heatmap!(ax_metal, metallicity, colormap=:rainbow, colorrange=[0.0, maximum(metallicity)])
 hm_noise = heatmap!(ax_noise, noise, colormap=:grays)
+lines!(ax_profile, 0.01:0.01:half_diagonal, x -> generalized_cauchy(x))
 Colorbar(f[1, 2], hm_metal)
 Colorbar(f[2, 2], hm_noise)
 display(f)
