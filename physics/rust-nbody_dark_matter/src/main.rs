@@ -50,10 +50,10 @@ struct ScaleFactor(f32);
 #[derive(Resource)]
 struct HubbleParameter(f32);
 
-/// One particle/body to simulate.
+/// One particle to simulate.
 #[derive(Component)]
 #[require(Transform, Visibility, Mesh3d, MeshMaterial3d<StandardMaterial>)]
-struct Body {
+struct Particle {
     mass: f32,
     velocity: Vec3,
     /// Last step's f(x_{n+1}). Should be reused as next step's f(x_n).
@@ -61,7 +61,7 @@ struct Body {
     accel: Option<Vec3>,
 }
 
-impl Default for Body {
+impl Default for Particle {
     fn default() -> Self {
         Self {
             mass: TOTAL_MASS / N as f32,
@@ -88,7 +88,7 @@ fn setup(
     // Spawn particles
     let mut rng = rand::rng();
     for _ in 0..N {
-        // Spawn particles uniformly in a 15 Mpc sphere centered in the origin
+        // Spawn particles uniformly in a 15 Mpc box centered in the origin
         // TODO: Add proper cosmological starting conditions.
         let pos = Vec3::new(
             rng.random_range(-1.0..1.0),
@@ -97,7 +97,7 @@ fn setup(
         ) * 15.;
 
         commands.spawn((
-            Body::default(),
+            Particle::default(),
             Transform::from_translation(pos),
             Mesh3d(mesh.clone()),
             MeshMaterial3d(mat.clone()),
@@ -130,7 +130,7 @@ fn integrate(
     time: Res<Time>,
     mut a: ResMut<ScaleFactor>,
     mut H: ResMut<HubbleParameter>,
-    mut particles: Query<(&mut Body, &mut Transform)>,
+    mut particles: Query<(&mut Particle, &mut Transform)>,
 ) {
     let dt = time.delta_secs() * SIMULATION_SPEED;
 
